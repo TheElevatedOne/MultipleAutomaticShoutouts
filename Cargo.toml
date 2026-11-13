@@ -1,0 +1,33 @@
+[package]
+name = "MultipleAutomaticShoutouts"
+version = "0.0.4"
+edition = "2024"
+description = "Monster Hunter: World plugin for Stracker's Loader: several copies of each automatic shoutout, one sent at random"
+publish = false
+
+[lib]
+name = "MultipleAutomaticShoutouts"
+crate-type = ["cdylib"]
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+toml = "1"
+windows = { version = "0.61", features = [
+    "Win32_Foundation",
+    "Win32_System_Diagnostics_Debug",
+    "Win32_System_Diagnostics_ToolHelp",
+    "Win32_System_Kernel",
+    "Win32_System_LibraryLoader",
+    "Win32_System_Memory",
+    "Win32_System_Threading",
+    "Win32_UI_Input_KeyboardAndMouse",
+    "Win32_UI_WindowsAndMessaging",
+] }
+
+[profile.release]
+lto = true
+codegen-units = 1
+strip = true
+opt-level = "s"
+# A panic must only stop this plugin, never the game.
+panic = "unwind"

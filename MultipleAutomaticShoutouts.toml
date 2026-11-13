@@ -1,0 +1,21 @@
+# MultipleAutomaticShoutouts config. Read once when the game starts; restart the game after a change.
+
+# How many pages of automatic shoutouts to keep, from 1 to 20. Each page holds one text and switch
+# per situation. When a situation comes up, one of the pages that have it turned on is sent at
+# random. With 1 page the game behaves as without the plugin, and the menu's hint is greyed out.
+Pages = 5
+
+# The key that turns the page the game's Automatic Shoutouts menu shows and edits, also while the
+# menu is open. It works while the game window has focus. Names: F1 to F24, A to Z, 0 to 9, Num0 to
+# Num9, Insert, Delete, Home, End, PageUp, PageDown, or a virtual-key code such as "0x76".
+SwitchKey = "F7"
+
+# The controller button that does the same, but only while the Shoutouts menu is open on its Auto
+# tab, so it doesn't get in the way of the button's own use in the game. The menu's button guide
+# shows it with the game's own icon. Names: A, B, X, Y, LB, RB, Back, Start, LeftStick, RightStick,
+# Up, Down, Left, Right, or None to turn it off.
+ControllerButton = "RightStick"
+
+# The text after the button in the menu's button guide. The page shown and the number of pages
+# follow it, as in "Cycle Through Pages (1/2)".
+GuideText = "Cycle Through Pages"

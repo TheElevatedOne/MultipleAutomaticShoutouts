@@ -1,0 +1,82 @@
+[img]https://img.shields.io/badge/CLAUDE-VIBECODED?style=for-the-badge&logo=claude&label=VIBECODED&labelColor=%23333333&color=%23de7356[/img]
+
+[size=4][b]Multiple Automatic Shoutouts[/b][/size]
+
+Gives the [b]Automatic Shoutouts[/b] menu several pages. Each time a situation comes up, the shoutout of a random page that has it turned on is sent, so fainting, mounting or setting a trap doesn't say the same line every time.
+
+[b]Only you need it.[/b] Other hunters see ordinary shoutouts and don't need the mod.
+
+[size=3][b]What it does[/b][/size]
+
+With [b]Pages = 5[/b], every automatic shoutout ("When you faint", "When you set a trap", …) has 5 pages, each with its own text and on/off switch. Write 4 different texts for "When you faint" and turn it off on the fifth page: each time you faint, one of the 4 is sent at random.
+
+[list]
+[*][b]Edited in the game's own menu.[/b] The Auto tab of [b]Communication → Shoutouts[/b] shows one page at a time. Press [b]F7[/b], or click the [b]right stick[/b] on the Auto tab, to turn to the next page. The list redraws at once.
+[*][b]Shown in the button guide.[/b] A third line under "Auto-translation On/Off" shows the right stick's icon, as the game draws it for your controller, and [b]Cycle Through Pages (2/5)[/b].
+[*][b]A line in your chat log[/b] also says the page, such as [i]Automatic Shoutouts: 2/5 Pages[/i].
+[*][b]A situation turned off on every page sends nothing[/b], as with the game's own switch.
+[*][b]An empty text sends the game's default text[/b], as the game does.
+[*][b]Pages are kept per hunter[/b], in [i]MultipleAutomaticShoutouts.sets.toml[/i] next to the DLL.
+[*][b]Nothing changes until you edit a page:[/b] a hunter's pages all start as copies of the shoutouts it has now.
+[/list]
+
+[size=3][b]Requirements[/b][/size]
+
+[list]
+[*]Monster Hunter: World: Iceborne, game version [b]15.23.00[/b]. On any other version the mod writes the mismatch to its log and changes nothing.
+[*][url=https://www.nexusmods.com/monsterhunterworld/mods/1982]Stracker's Loader[/url]
+[*]A CRC bypass plugin, such as [b]!CRCBypass.dll[/b]. The mod changes 31 bytes of the game's code and two entries of the Shoutouts menu, which the game's integrity check would otherwise catch.
+[/list]
+
+[size=3][b]Installation[/b][/size]
+
+[list=1]
+[*]Back up your save. The mod writes the page you pick into your save's shoutout texts.
+[*]Copy [b]MultipleAutomaticShoutouts.dll[/b] and [b]MultipleAutomaticShoutouts.toml[/b] to [i]Monster Hunter World/nativePC/plugins/[/i].
+[*]Start the game. The mod writes [i]MultipleAutomaticShoutouts.log[/i] next to the DLL; it should list "automatic shoutouts: hooked" and "shoutouts menu: hooked".
+[/list]
+
+To uninstall, delete the DLL, the config and the log. The page shown last stays in your save, as normal shoutouts. [i]MultipleAutomaticShoutouts.sets.toml[/i] holds your other pages; delete it too if you don't want them back.
+
+[size=3][b]Editing your pages[/b][/size]
+
+[list=1]
+[*]Open [b]Communication → Shoutouts[/b] and go to the [b]Auto[/b] tab.
+[*]Press [b]F7[/b] or click the right stick until the button guide shows the page you want, for example [i]Cycle Through Pages (2/5)[/i].
+[*]Change texts and switches as usual. The mod saves them to its file within a few seconds.
+[*]Repeat for the other pages.
+[/list]
+
+The key also works with the menu closed. The right stick only works on the Auto tab, because it moves the camera in the field.
+
+[size=3][b]Configuration[/b][/size]
+
+The file is [i]MultipleAutomaticShoutouts.toml[/i], next to the DLL. The mod creates it with the defaults if it's missing, and reads it when the game starts.
+
+[list]
+[*][b]Pages[/b] (default [i]5[/i]): pages of automatic shoutouts, from 1 to 20. With 1, the game sends its own shoutouts and the hint in the button guide is greyed out.
+[*][b]SwitchKey[/b] (default [i]"F7"[/i]): turns the page while the game window has focus. F1–F24, A–Z, 0–9, Num0–Num9, Insert, Delete, Home, End, PageUp, PageDown, or a key code such as "0x76".
+[*][b]ControllerButton[/b] (default [i]"RightStick"[/i]): does the same on the Auto tab, and is the icon in the button guide. A, B, X, Y, LB, RB, Back, Start, LeftStick, RightStick, Up, Down, Left, Right, or None.
+[*][b]GuideText[/b] (default [i]"Cycle Through Pages"[/i]): the hint's text in the button guide, followed by the page, such as (2/5).
+[/list]
+
+When you lower [b]Pages[/b], the pages past the new number are dropped, except the one in the menu. When you raise it, the new pages start as copies of the one in the menu.
+
+[size=3][b]Known issues[/b][/size]
+
+[list]
+[*]The game appears to send automatic shoutouts only when you're in a session with other hunters, so you won't see them, or this mod's picks, while playing alone.
+[*]The controller button is read through XInput. If Steam Input hides your controller from it, use the key.
+[*]With the keyboard, the hint still shows the controller button's icon; the key is F7 unless you changed it.
+[*]With [b]Pages = 1[/b] the hint is greyed out only if the game has one of the grey text styles the mod tries. The log says which one it used, or that the hint stays white.
+[*]Turning the page while you're typing a shoutout puts the text you confirm on the new page.
+[*]Pages are kept by save slot and hunter name. A new hunter with the same name in the same slot gets the old hunter's pages.
+[/list]
+
+[size=3][b]Compatibility[/b][/size]
+
+The mod hooks the game's automatic shoutout function, the chat update and the Shoutouts menu. Another plugin that hooks the same functions can't run alongside it; the log names the function if that happens.
+
+[size=3][b]Bugs and questions[/b][/size]
+
+Post in the [b]Posts[/b] tab, or file a bug in the [b]Bugs[/b] tab. For bugs, attach [i]MultipleAutomaticShoutouts.log[/i] from the plugins folder and say what you did before it happened.

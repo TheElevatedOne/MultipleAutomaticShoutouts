@@ -1,0 +1,71 @@
+name: Build And Release
+
+# Runs on a pushed tag (the bare version, e.g. 0.0.4) or by hand from the Actions tab.
+# Builds the DLL for Windows with MinGW and publishes release <version> from Cargo.toml, with the
+# top CHANGELOG.md entry as its notes. Re-running for the same version replaces the assets.
+on:
+  push:
+    tags:
+      - '*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Check-out repository
+        uses: actions/checkout@v4
+
+      - name: Install MinGW
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends gcc-mingw-w64-x86-64 zip
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-pc-windows-gnu
+
+      - name: Read version
+        id: version
+        run: |
+          version=$(sed -n 's/^version = "\(.*\)"/\1/p' Cargo.toml | head -n1)
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "Building MultipleAutomaticShoutouts $version"
+          if [ "${{ github.ref_type }}" = "tag" ] && [ "${{ github.ref_name }}" != "$version" ]; then
+            echo "Tag ${{ github.ref_name }} doesn't match Cargo.toml version $version"; exit 1
+          fi
+          if ! head -n5 CHANGELOG.md | grep -qx "## $version"; then
+            echo "CHANGELOG.md doesn't start with ## $version"; exit 1
+          fi
+
+      - name: Build
+        run: cargo build --release --locked
+
+      - name: Package
+        run: |
+          version=${{ steps.version.outputs.version }}
+          dll=target/x86_64-pc-windows-gnu/release/MultipleAutomaticShoutouts.dll
+          # The zip unpacks into the game folder as it is.
+          mkdir -p stage/nativePC/plugins dist
+          cp "$dll" MultipleAutomaticShoutouts.toml stage/nativePC/plugins/
+          (cd stage && zip -r "../dist/MultipleAutomaticShoutouts-$version.zip" nativePC)
+          cp "$dll" MultipleAutomaticShoutouts.toml dist/
+          (cd dist && sha256sum * > SHA256SUMS)
+          # Release notes: the top CHANGELOG entry, without its heading.
+          awk '/^## /{if (seen) exit; seen=1; next} seen' CHANGELOG.md > notes.md
+
+      - name: Create GitHub Release
+        uses: ncipollo/release-action@v1.20.0
+        with:
+          artifacts: dist/*
+          name: ${{ steps.version.outputs.version }} - MultipleAutomaticShoutouts
+          tag: ${{ steps.version.outputs.version }}
+          commit: ${{ github.sha }}
+          bodyFile: notes.md
+          allowUpdates: true
+          replacesArtifacts: true

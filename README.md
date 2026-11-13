@@ -80,8 +80,27 @@ missing, and reads it once at game start.
 |---|---|---|
 | `Pages` | `5` | Pages of automatic shoutouts, from 1 to 20. With `1` the game sends its own shoutouts and the guide hint is greyed out. Called `Copies` before 0.0.3, which still works |
 | `SwitchKey` | `"F7"` | Turns the page the menu shows, while the game window has focus. `F1`–`F24`, `A`–`Z`, `0`–`9`, `Num0`–`Num9`, `Insert`, `Delete`, `Home`, `End`, `PageUp`, `PageDown`, or a virtual-key code such as `"0x76"` |
-| `ControllerButton` | `"RightStick"` | Does the same while the Shoutouts menu is open on its Auto tab, and is the icon in the button guide. `A`, `B`, `X`, `Y`, `LB`, `RB`, `Back`, `Start`, `LeftStick`, `RightStick`, `Up`, `Down`, `Left`, `Right`, or `None` (the guide then shows `[F7]`) |
+| `ControllerButton` | `"RightStick"` | Does the same while the Shoutouts menu is open on its Auto tab, and is the icon in the button guide. Xbox names, see [below](#controller-button-names): `A`, `B`, `X`, `Y`, `LB`, `RB`, `Back`, `Start`, `LeftStick`, `RightStick`, `Up`, `Down`, `Left`, `Right`, or `None` (the guide then shows `[F7]`) |
 | `GuideText` | `"Cycle Through Pages"` | The hint's text in the button guide, followed by the page, such as `(2/5)` |
+
+### Controller button names
+
+`ControllerButton` uses the Xbox controller's names. PlayStation and Nintendo controllers label the same buttons
+differently, so pick the name by the button's place on the pad:
+
+| `ControllerButton` | Xbox | PlayStation | Nintendo Switch |
+|---|---|---|---|
+| `A` | A (bottom) | Cross | B |
+| `B` | B (right) | Circle | A |
+| `X` | X (left) | Square | Y |
+| `Y` | Y (top) | Triangle | X |
+| `LB` / `RB` | LB / RB | L1 / R1 | L / R |
+| `Back` | View | Create / Share | − (Minus) |
+| `Start` | Menu | Options | + (Plus) |
+| `LeftStick` / `RightStick` | Left / right stick click | L3 / R3 | Left / right stick click |
+| `Up`, `Down`, `Left`, `Right` | D-pad | D-pad | D-pad |
+
+The button guide shows the game's icon for your controller either way.
 
 When you lower `Pages`, the pages past the new number are dropped, except the one in the menu, which moves to the
 last place. When you raise it, the new pages start as copies of the one in the menu.

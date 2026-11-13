@@ -21,7 +21,7 @@ install: build
 
 uninstall:
 	rm -f "$(PLUGINS_DIR)/MultipleAutomaticShoutouts.dll" "$(PLUGINS_DIR)/MultipleAutomaticShoutouts.toml" "$(PLUGINS_DIR)/MultipleAutomaticShoutouts.log"
-	@echo "Kept $(PLUGINS_DIR)/MultipleAutomaticShoutouts.sets.toml, your copies. Delete it by hand if you want them gone."
+	@echo "Kept $(PLUGINS_DIR)/MultipleAutomaticShoutouts.sets.toml, your pages. Delete it by hand if you want them gone."
 
 clean:
 	rm -rf target

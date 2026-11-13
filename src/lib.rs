@@ -83,7 +83,7 @@ fn run(dll_path: PathBuf) {
     }
     log!("game ready after {:.1}s", start.elapsed().as_secs_f32());
 
-    menu::configure(base, config::icon_name(button), &config.switch_key, &config.guide_text);
+    menu::configure(base, config::icon_name(button), &config.switch_key, &config.guide_text, config.hint_on_own_line);
     if config.pages <= 1 {
         // Shoutouts are left to the game; only the menu's hint shows, greyed out.
         log!("Pages is 1, so shoutouts are left to the game and the menu's hint is greyed out");

@@ -1,6 +1,6 @@
 [package]
 name = "MultipleAutomaticShoutouts"
-version = "0.0.4"
+version = "0.0.5"
 edition = "2024"
 description = "Monster Hunter: World plugin for Stracker's Loader: several copies of each automatic shoutout, one sent at random"
 publish = false

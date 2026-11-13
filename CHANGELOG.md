@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.0.5
+
+- Changed: `SwitchKey` and `ControllerButton` can no longer be a key or button the Shoutouts menu's Auto tab
+  already uses, such as Esc, N, R, C, Q, E, F, WASD, B, X, Y, LB/RB, RT, Start or the D-pad, nor a key that types
+  or edits text, which the switch also caught while you typed a shoutout. `SwitchKey` takes F1–F24, Insert, PageUp
+  and PageDown; `ControllerButton` takes RightStick, LeftStick and Back. A config naming another falls back to the
+  default and the log says why.
+- Added: `HintOnOwnLine` (`true` by default). With `false` the hint follows "Auto-translation On/Off" on the same
+  line, as in 0.0.3, in case its own line doesn't show right.
+- Fixed: while the game sent a shoutout from another page, a save-to-file copy or a page turn on another thread
+  could take that one text for the shown page's. Both now wait until the game is done.
+
 ## 0.0.4
 
 - Changed: the button guide hint has a line of its own under "Auto-translation On/Off". Before, both shared one

@@ -8,8 +8,8 @@
 //!
 //! The button guide hint goes on a line of its own under the last entry of the Auto tab's guides
 //! ("Auto-translation On/Off"), as `<ICON PAD_R3> Cycle Through Pages (1/2)` after a line break in
-//! that entry's text. Next to it in the same row, the guide squeezes both to fit its width. The game draws `<ICON …>`
-//! tags with the glyph of the controller in use, as in its own texts. With one page the hint is
+//! that entry's text. Next to it in the same row, the guide squeezes both to fit its width, which
+//! `HintOnOwnLine = false` goes back to. The game draws `<ICON …>` tags with the glyph of the controller in use, as in its own texts. With one page the hint is
 //! greyed out with a grey text style, if the game has one of the names tried.
 
 use std::{
@@ -70,6 +70,8 @@ struct Hint {
     /// `<ICON …>` tag of the controller button, or the key name in brackets without one.
     button: String,
     text: String,
+    /// What goes between the game's last guide text and the hint: a line break, or spaces.
+    separator: &'static str,
 }
 
 /// The guide texts made so far. The game keeps pointers to them, so they live as long as the game.
@@ -83,13 +85,14 @@ struct Guide {
     grey: Option<Option<&'static str>>,
 }
 
-pub fn configure(base: usize, icon: Option<&str>, key: &str, text: &str) {
+pub fn configure(base: usize, icon: Option<&str>, key: &str, text: &str, own_line: bool) {
     BASE.store(base, Relaxed);
     let button = match icon {
         Some(icon) => format!("<ICON {icon}>"),
         None => format!("[{key}]"),
     };
-    let _ = HINT.set(Hint { button, text: text.to_owned() });
+    let separator = if own_line { "\r\n" } else { "   " };
+    let _ = HINT.set(Hint { button, text: text.to_owned(), separator });
 }
 
 pub fn set_originals(step: usize, dtor: usize) {
@@ -202,7 +205,7 @@ unsafe fn update_guide(menu: usize) -> bool {
                 Some(text) => text.as_ptr() as usize,
                 None => {
                     let base = CStr::from_ptr(original as *const c_char).to_string_lossy();
-                    let Ok(text) = CString::new(format!("{base}\r\n{suffix}")) else { continue };
+                    let Ok(text) = CString::new(format!("{base}{}{suffix}", hint.separator)) else { continue };
                     let ptr = text.as_ptr() as usize;
                     guide.texts.insert(key, text);
                     guide.originals.insert(ptr, original);

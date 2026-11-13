@@ -7,9 +7,9 @@ each time a situation comes up, sends the shoutout of a random page that has it 
 other hunters see ordinary shoutouts.
 
 > [!IMPORTANT]
-> Version 0.0.4 was built from a reading of the game's code. 0.0.3 was tested in game; the hint's own line and
-> its greyed-out look with one page are untested. Check `MultipleAutomaticShoutouts.log` after your first
-> launch.
+> Version 0.0.5 was built from a reading of the game's code. 0.0.3 was tested in game; the hint's own line, its
+> greyed-out look with one page and the narrower key choice are untested. If the hint doesn't show right, set
+> `HintOnOwnLine = false`. Check `MultipleAutomaticShoutouts.log` after your first launch.
 
 > [!WARNING]
 > The plugin changes your save's shoutout texts while it runs (it puts the page you pick in the save) and writes
@@ -51,7 +51,7 @@ time, and so on.
 A working start looks like this:
 
 ```text
-MultipleAutomaticShoutouts 0.0.4
+MultipleAutomaticShoutouts 0.0.5
 game ready after 0.4s
 automatic shoutouts: hooked, 5 pages
 switch key: hooked, F7 turns the page in the menu, and RightStick does while the Auto tab is open
@@ -79,28 +79,41 @@ missing, and reads it once at game start.
 | Key | Default | Description |
 |---|---|---|
 | `Pages` | `5` | Pages of automatic shoutouts, from 1 to 20. With `1` the game sends its own shoutouts and the guide hint is greyed out. Called `Copies` before 0.0.3, which still works |
-| `SwitchKey` | `"F7"` | Turns the page the menu shows, while the game window has focus. `F1`–`F24`, `A`–`Z`, `0`–`9`, `Num0`–`Num9`, `Insert`, `Delete`, `Home`, `End`, `PageUp`, `PageDown`, or a virtual-key code such as `"0x76"` |
-| `ControllerButton` | `"RightStick"` | Does the same while the Shoutouts menu is open on its Auto tab, and is the icon in the button guide. Xbox names, see [below](#controller-button-names): `A`, `B`, `X`, `Y`, `LB`, `RB`, `Back`, `Start`, `LeftStick`, `RightStick`, `Up`, `Down`, `Left`, `Right`, or `None` (the guide then shows `[F7]`) |
+| `SwitchKey` | `"F7"` | Turns the page the menu shows, while the game window has focus. `F1`–`F24`, `Insert`, `PageUp`, `PageDown`, or a virtual-key code such as `"0x76"`. See [Keys and buttons left out](#keys-and-buttons-left-out) |
+| `ControllerButton` | `"RightStick"` | Does the same while the Shoutouts menu is open on its Auto tab, and is the icon in the button guide. `RightStick`, `LeftStick`, `Back`, or `None` (the guide then shows `[F7]`). Xbox names, see [below](#controller-button-names) |
 | `GuideText` | `"Cycle Through Pages"` | The hint's text in the button guide, followed by the page, such as `(2/5)` |
+| `HintOnOwnLine` | `true` | Puts the hint on a line of its own. With `false` it follows "Auto-translation On/Off" on the same line, where the game squeezes both to fit |
 
 ### Controller button names
 
 `ControllerButton` uses the Xbox controller's names. PlayStation and Nintendo controllers label the same buttons
-differently, so pick the name by the button's place on the pad:
+differently:
 
 | `ControllerButton` | Xbox | PlayStation | Nintendo Switch |
 |---|---|---|---|
-| `A` | A (bottom) | Cross | B |
-| `B` | B (right) | Circle | A |
-| `X` | X (left) | Square | Y |
-| `Y` | Y (top) | Triangle | X |
-| `LB` / `RB` | LB / RB | L1 / R1 | L / R |
+| `RightStick` | Right stick click | R3 | Right stick click |
+| `LeftStick` | Left stick click | L3 | Left stick click |
 | `Back` | View | Create / Share | − (Minus) |
-| `Start` | Menu | Options | + (Plus) |
-| `LeftStick` / `RightStick` | Left / right stick click | L3 / R3 | Left / right stick click |
-| `Up`, `Down`, `Left`, `Right` | D-pad | D-pad | D-pad |
 
 The button guide shows the game's icon for your controller either way.
+
+### Keys and buttons left out
+
+The switch can't be a key or button the Shoutouts menu's Auto tab already uses, as its button guide shows them:
+
+| Input | Keyboard | Controller (Xbox / PlayStation / Nintendo) |
+|---|---|---|
+| Back, close the menu | Esc, right click | B / Circle / A, and Menu / Options / + |
+| Shoutout On/Off | N | X / Square / Y |
+| Edit Shoutout | R | Y / Triangle / X |
+| Auto-translation On/Off | C | RT / R2 / ZR |
+| Change tab | Q, E | LB, RB / L1, R1 / L, R |
+| Confirm | F, Enter, Space | A / Cross / B |
+| Move the cursor, turn the menu's pages | WASD, arrows, mouse wheel | D-pad, left stick |
+
+The key also works while you type a shoutout, so letters, digits, the numpad, punctuation, Backspace, Tab, Delete,
+Home and End are left out too, as are Shift, Ctrl, Alt and the mouse buttons. A config naming one of them falls
+back to the default, and the log says why.
 
 When you lower `Pages`, the pages past the new number are dropped, except the one in the menu, which moves to the
 last place. When you raise it, the new pages start as copies of the one in the menu.
@@ -137,7 +150,7 @@ bit and builds the message from the slot's text. The plugin hooks it and:
 1. copies the slot's 18 entries and mask into the shown page, so a change just made in the menu counts,
 2. picks one of the pages that have this situation on, at random, and
 3. if that's not the shown page, puts its text and switch in the slot, calls the game's function, and puts the
-   slot's own entry back.
+   slot's own entry back. Until then, the plugin neither copies the slot nor turns the page.
 
 It also hooks `sChat`'s per-frame update (vtable slot 6, RVA `0x1A511F0`). There it reads the switch key and the
 controller (XInput), swaps the shown page's entries in the slot for the next page's, and posts the chat log line
@@ -159,14 +172,15 @@ The menu builds its button guides once (RVA `0x1E0E850`) as lists of 0x18-byte e
 pointer. The Auto tab uses the list at `+0x3440`, or `+0x3640` on a row that isn't unlocked yet. The plugin points
 the last entry's text ("Auto-translation On/Off") at a copy with a line break and the hint after it, `<ICON
 PAD_R3> Cycle Through Pages (2/5)`, so the hint takes the third line. The guide lays its entries out in rows by
-width and shrinks an entry's text to fit, so on the same line the two texts were squeezed. `<ICON …>` is the game's own text tag for button glyphs, which it draws for the controller in use.
+width and shrinks an entry's text to fit, so on the same line the two texts are squeezed (`HintOnOwnLine = false`).
+`<ICON …>` is the game's own text tag for button glyphs, which it draws for the controller in use.
 After a switch it shows the guide again through the menu's `0x1E0CC00`, as a cursor move does. With one page the
 hint is wrapped in a grey `<STYL …>`: the plugin asks the game's style lookup (RVA `0x2340990`) for a list of
 likely grey style names and uses the first it has. The game ignores a style it doesn't have.
 
 ## Known issues
 
-- Not tested in game, see the note at the top.
+- 0.0.4 and 0.0.5 aren't tested in game, see the note at the top.
 - The grey style is found by trying names the game might use. If it has none of them, the log says so and the hint
   stays white with one page.
 - With the keyboard, the hint still shows the controller button's icon, or whatever the game shows for it; the key

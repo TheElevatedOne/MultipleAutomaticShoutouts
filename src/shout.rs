@@ -49,6 +49,10 @@ static PENDING: Mutex<Option<String>> = Mutex::new(None);
 static SETS_PATH: OnceLock<PathBuf> = OnceLock::new();
 /// Whether the update hook has run, to tell in the log whether the switch key can work.
 static UPDATE_SEEN: AtomicBool = AtomicBool::new(false);
+/// Set while another page's entry sits in the save for the game to send. Set and cleared under
+/// the slot's lock. Until it clears, the save isn't the shown page, so nothing copies it or turns
+/// the page.
+static SWAPPED: AtomicBool = AtomicBool::new(false);
 
 type AutoShoutout = unsafe extern "system" fn(usize, u32, usize, usize) -> usize;
 type Update = unsafe extern "system" fn(usize, usize, usize, usize) -> usize;
@@ -59,6 +63,8 @@ struct State {
     store: Store,
     dirty: bool,
     frames: u32,
+    /// A press that came while an entry was swapped, kept for the next update.
+    pending_press: bool,
 }
 
 pub fn configure(base: usize, pages: usize, input: Input, sets_path: PathBuf) {
@@ -79,7 +85,7 @@ pub fn configure(base: usize, pages: usize, input: Input, sets_path: PathBuf) {
             hunter.shown + 1
         );
     }
-    *lock(&STATE) = Some(State { pages, input, store, dirty: changed, frames: 0 });
+    *lock(&STATE) = Some(State { pages, input, store, dirty: changed, frames: 0, pending_press: false });
     let _ = SETS_PATH.set(sets_path.clone());
     std::thread::spawn(move || {
         loop {
@@ -210,6 +216,10 @@ enum Plan {
 fn plan(index: usize) -> Plan {
     let Some(slot) = game::current_slot(BASE.load(Relaxed)) else { return Plan::Pass };
     slot.locked(|| {
+        // Another shoutout is being sent from a swapped entry on another thread.
+        if SWAPPED.load(Relaxed) {
+            return Plan::Pass;
+        }
         let mut state = lock(&STATE);
         let Some(state) = state.as_mut() else { return Plan::Pass };
         let Some(hunter) = sync(state, &slot, true) else { return Plan::Pass };
@@ -226,6 +236,7 @@ fn plan(index: usize) -> Plan {
         let was_on = slot.enabled() & (1 << index) != 0;
         slot.set_entry(index, &written);
         slot.set_enabled(slot.enabled() | 1 << index);
+        SWAPPED.store(true, Relaxed);
         Plan::Swapped { slot, saved, was_on, written }
     })
 }
@@ -252,6 +263,7 @@ pub unsafe extern "system" fn auto_shoutout_hook(chat: usize, index: u32, r8: us
                 }
                 let bit = 1 << index;
                 slot.set_enabled(if was_on { slot.enabled() | bit } else { slot.enabled() & !bit });
+                SWAPPED.store(false, Relaxed);
             });
             result
         }
@@ -281,7 +293,7 @@ fn tick() -> Option<String> {
         let state = state.as_mut()?;
         let input = state.input.poll();
         // The button has other uses outside the menu, such as the camera.
-        let pressed = input.key || (input.button && menu_open);
+        let pressed = input.key || (input.button && menu_open) || std::mem::take(&mut state.pending_press);
         state.frames += 1;
         let sync_due = state.frames >= SYNC_INTERVAL;
         if sync_due {
@@ -295,6 +307,10 @@ fn tick() -> Option<String> {
             message = slot.locked(|| {
                 let mut state = lock(&STATE);
                 let state = state.as_mut()?;
+                if SWAPPED.load(Relaxed) {
+                    state.pending_press = pressed;
+                    return None;
+                }
                 let Some(hunter) = sync(state, &slot, pressed || menu_open) else {
                     return pressed.then(|| "Automatic Shoutouts: load a hunter first".to_owned());
                 };

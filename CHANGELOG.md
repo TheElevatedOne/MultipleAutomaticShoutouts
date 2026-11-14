@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.0.6
+
+- Changed: the button guide hint is an entry of its own, drawn like the game's entries: the button's icon in a key
+  box, laid out by the game. Before, it was a small inline icon and text tucked under "Auto-translation On/Off"
+  as part of that entry. With `None` it is still text, and `HintOnOwnLine` only applies then.
+
 ## 0.0.5
 
 - Changed: `SwitchKey` and `ControllerButton` can no longer be a key or button the Shoutouts menu's Auto tab

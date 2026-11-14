@@ -90,7 +90,14 @@ pub const GUIDE_ENTRIES: usize = 0x30;
 pub const GUIDE_COUNT: usize = 0x1B0;
 pub const GUIDE_MAX: usize = 16;
 pub const GUIDE_ENTRY_SIZE: usize = 0x18;
+/// An entry: the button's guide id (u32), which inputs it shows for (u32, 0x1F for all), the text,
+/// and a u32 kind: 0 for an ordinary entry, 2 for the Manual tab's "Recipient: …" entry, whose text
+/// the game fills in itself.
+pub const GUIDE_ENTRY_BUTTON: usize = 0x00;
+pub const GUIDE_ENTRY_FLAGS: usize = 0x04;
 pub const GUIDE_ENTRY_TEXT: usize = 0x08;
+pub const GUIDE_ENTRY_KIND: usize = 0x10;
+pub const GUIDE_FLAGS_ALL: u32 = 0x1F;
 /// `setAutoGuide(menu, _, row, menu)`: shows the Auto tab's guide for a row of the page (or -1),
 /// as the menu does when the cursor moves.
 pub const SET_AUTO_GUIDE_RVA: usize = 0x1E0_CC00;

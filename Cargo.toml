@@ -1,6 +1,6 @@
 [package]
 name = "MultipleAutomaticShoutouts"
-version = "0.0.5"
+version = "0.0.6"
 edition = "2024"
 description = "Monster Hunter: World plugin for Stracker's Loader: several copies of each automatic shoutout, one sent at random"
 publish = false
@@ -8,6 +8,11 @@ publish = false
 [lib]
 name = "MultipleAutomaticShoutouts"
 crate-type = ["cdylib"]
+
+[features]
+# A test build whose Auto tab button guide shows guide ids 0x00 to 0x3B with their icons, 12 per
+# page, labelled with the id, to find which id draws which button.
+guide-ids = []
 
 [dependencies]
 serde = { version = "1", features = ["derive"] }

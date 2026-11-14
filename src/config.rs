@@ -94,6 +94,18 @@ pub fn icon_name(button: u16) -> Option<&'static str> {
     })
 }
 
+/// The game's button guide id for a controller button mask. Read off the game's own guide with a
+/// `guide-ids` test build: 0x0A draws the left stick click (Shift on the keyboard), 0x0B the right
+/// stick click (Tab), 0x11 View (Ctrl).
+pub fn guide_id(button: u16) -> Option<u32> {
+    Some(match button {
+        0x0020 => 0x11,
+        0x0040 => 0x0A,
+        0x0080 => 0x0B,
+        _ => return None,
+    })
+}
+
 /// Controller buttons with a use on the Shoutouts menu's Auto tab, from the game's button guide:
 /// A confirms, B closes, X turns a shoutout on or off, Y edits it, LB and RB change tabs, the
 /// D-pad moves the cursor and turns the menu's own pages, and Start closes the whole menu.

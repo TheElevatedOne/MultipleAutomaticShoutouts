@@ -6,11 +6,6 @@ A Monster Hunter: World plugin for Stracker's Loader that gives the Automatic Sh
 each time a situation comes up, sends the shoutout of a random page that has it turned on. Only you need it; the
 other hunters see ordinary shoutouts.
 
-> [!IMPORTANT]
-> Version 0.0.5 was built from a reading of the game's code. 0.0.3 was tested in game; the hint's own line, its
-> greyed-out look with one page and the narrower key choice are untested. If the hint doesn't show right, set
-> `HintOnOwnLine = false`. Check `MultipleAutomaticShoutouts.log` after your first launch.
-
 > [!WARNING]
 > The plugin changes your save's shoutout texts while it runs (it puts the page you pick in the save) and writes
 > the other pages to a file next to it. Back up your save first, like with any plugin that touches it.
@@ -24,9 +19,8 @@ time, and so on.
 
 - **Edited in the game's own menu.** The Auto tab of **Communication → Shoutouts** shows one page at a time. Press
   <kbd>F7</kbd>, or click the right stick on the Auto tab, to turn to the next page. The list redraws at once.
-- **Shown in the menu's button guide**, on a third line under "Auto-translation On/Off": the right stick's icon,
-  as the game draws it for your controller, then `Cycle Through Pages (2/5)`. With `Pages = 1` the hint is greyed
-  out.
+- **Shown in the menu's button guide** as an entry like the game's own: the right stick's key box, as the game
+  draws it for your controller, then `Cycle Through Pages (2/5)`. With `Pages = 1` the hint is greyed out.
 - **A line in the chat log** also says the page, such as `Automatic Shoutouts: 2/5 Pages`.
 - **A situation turned off on every page sends nothing**, as with the game's own switch.
 - **An empty text sends the game's default text**, as the game does.
@@ -82,7 +76,7 @@ missing, and reads it once at game start.
 | `SwitchKey` | `"F7"` | Turns the page the menu shows, while the game window has focus. `F1`–`F24`, `Insert`, `PageUp`, `PageDown`, or a virtual-key code such as `"0x76"`. See [Keys and buttons left out](#keys-and-buttons-left-out) |
 | `ControllerButton` | `"RightStick"` | Does the same while the Shoutouts menu is open on its Auto tab, and is the icon in the button guide. `RightStick`, `LeftStick`, `Back`, or `None` (the guide then shows `[F7]`). Xbox names, see [below](#controller-button-names) |
 | `GuideText` | `"Cycle Through Pages"` | The hint's text in the button guide, followed by the page, such as `(2/5)` |
-| `HintOnOwnLine` | `true` | Puts the hint on a line of its own. With `false` it follows "Auto-translation On/Off" on the same line, where the game squeezes both to fit |
+| `HintOnOwnLine` | `true` | Only for `ControllerButton = "None"`, whose hint is text after "Auto-translation On/Off": puts it on a line of its own. With `false` it follows on the same line |
 
 ### Controller button names
 
@@ -168,23 +162,25 @@ which `uGUI::update` calls every frame, and the destructor. Slot 59 tells whethe
 page)` (RVA `0x1E0D110`) with the Auto tab's page from `+0x3A98`, the function the menu uses to fill a page when it
 opens or turns, on the menu's own update.
 
-The menu builds its button guides once (RVA `0x1E0E850`) as lists of 0x18-byte entries: an icon, flags, a text
-pointer. The Auto tab uses the list at `+0x3440`, or `+0x3640` on a row that isn't unlocked yet. The plugin points
-the last entry's text ("Auto-translation On/Off") at a copy with a line break and the hint after it, `<ICON
-PAD_R3> Cycle Through Pages (2/5)`, so the hint takes the third line. The guide lays its entries out in rows by
-width and shrinks an entry's text to fit, so on the same line the two texts are squeezed (`HintOnOwnLine = false`).
-`<ICON …>` is the game's own text tag for button glyphs, which it draws for the controller in use.
+The menu builds its button guides once (RVA `0x1E0E850`) as lists of up to 16 0x18-byte entries at `+0x30`, with
+the count at `+0x1B0`. An entry holds the button's guide id (u32), the inputs it shows for (u32, `0x1F`), a text
+pointer, and a u32 kind: 0 for an ordinary entry, 2 for the Manual tab's "Recipient: …" entry, whose text the game
+fills in itself. The Auto tab uses the list at `+0x3440`, or `+0x3640` on a row that isn't unlocked yet. The
+plugin adds an ordinary entry to both with the button's guide id and the hint's text, and the game lays it out
+with its other entries. The ids were read off the game's own guide with a test build (`cargo build --features
+guide-ids`), which lists every id with its icon: `0x0B` is the right stick click (Tab on the keyboard), `0x0A`
+the left stick click (Shift), `0x11` View (Ctrl). With `None`, the hint goes after the last entry's text instead,
+as `[F7]` and the text, after a line break or spaces.
 After a switch it shows the guide again through the menu's `0x1E0CC00`, as a cursor move does. With one page the
 hint is wrapped in a grey `<STYL …>`: the plugin asks the game's style lookup (RVA `0x2340990`) for a list of
 likely grey style names and uses the first it has. The game ignores a style it doesn't have.
 
 ## Known issues
 
-- 0.0.4 and 0.0.5 aren't tested in game, see the note at the top.
 - The grey style is found by trying names the game might use. If it has none of them, the log says so and the hint
   stays white with one page.
-- With the keyboard, the hint still shows the controller button's icon, or whatever the game shows for it; the key
-  is <kbd>F7</kbd> unless you changed `SwitchKey`.
+- With the keyboard, the hint shows the game's key for the controller button (Tab for the right stick click), but
+  the switch key is <kbd>F7</kbd> unless you changed `SwitchKey`.
 - The controller button is read through XInput. If Steam Input hides your controller from XInput, use the key, or
   tell me and the button can be read from the game's own input instead.
 - Pressing the switch while a text is being typed in the menu turns the page underneath it, so the text you confirm

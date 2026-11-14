@@ -22,7 +22,7 @@ ControllerButton = "RightStick"
 # follow it, as in "Cycle Through Pages (1/2)".
 GuideText = "Cycle Through Pages"
 
-# Whether the hint gets a line of its own under "Auto-translation On/Off". With false it follows
-# that text on the same line, where the game squeezes both to fit. Try false if the hint doesn't
-# show or the guide looks broken.
+# Only for ControllerButton = "None", whose hint is text after "Auto-translation On/Off":
+# whether it gets a line of its own. With false it follows that text on the same line. The stick
+# buttons get an entry of their own, which the game lays out itself.
 HintOnOwnLine = true
